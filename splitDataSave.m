@@ -1,10 +1,6 @@
 function splitDataSave(data)
 
-
-
 savefile(data);
-
-
 
 
 
