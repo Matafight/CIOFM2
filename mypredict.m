@@ -1,7 +1,7 @@
-function [rato,mae]=mypredict(datatrain,yt,w,B,y);
+function [rato,mae]=mypredict(wtr,ytr,wte,yte,B);
 
 
-[meanfeat,uniqueY]=separateClasses(datatrain,yt);
+[meanfeat,uniqueY]=separateClasses(wtr,ytr);
 
 bk=[];
 numcls=size(meanfeat,1);
@@ -11,8 +11,8 @@ end
 
 
 %B is a matrix .
-[m,n]=size(w);
-preval=w*reshape(B,n,1);
+[m,n]=size(wte);
+preval=wte*reshape(B,n,1);
 
 bk=bk*reshape(B,n,1);
 bk=[bk;inf];
@@ -26,14 +26,14 @@ tempdiff=preval-bk;
 [val,index]=max(tempdiff<=0,[],2);
 
 
-diffval=index-y;
+diffval=index-yte;
  
 %return MZE,this is the accuracy
 ind=find(diffval == 0);
 rato=length(ind)/m;
 
 %return MAE
-tmae=abs(index-y);
+tmae=abs(index-yte);
 mae=sum(tmae)/m;
 
 
