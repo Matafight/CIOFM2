@@ -55,8 +55,6 @@ ret.par4=0;
 ret.rato=0;
 bestret=repmat(ret,625,1);
 iterk=0;
-acc=0;
-mae=0;
  for par1=1:5;
       for par2=1:5;
           for par3=1:5;
@@ -164,53 +162,7 @@ end
 bestpar=bestret(bestrow)
 
 
-function [svdw,wtr,wte,Ytr,Yte]=loadMyData(data,testdata);
 
 
 
-[datam,datan]=size(data);
-testrow=size(testdata,1);
-
-Xtr=data(:,1:datan-1);
-Ytr=data(:,datan);
-
-Xte=testdata(:,1:datan-1);
-Yte=testdata(:,datan);
-
-Xtr=[ones(datam,1),Xtr];
-Xte=[ones(testrow,1),Xte];
-
-B=zeros(datan+1,datan+1);   
-
-wtr=[];
-wte=[];
-for  i=1:datan
-    for j =1:datan
-   wtr=[wtr,Xtr(:,j).*Xtr(:,i)];
-   wte=[wte,Xte(:,j).*Xte(:,i)];
-    end
-end
-
-[u,s,v]=svd(wtr,'econ');
-grank=sum(sum(s~=0,2));
-s=s(1:grank,1:grank);
-u=u(:,1:grank);
-v=v(:,1:grank);
-svdw.s=s;
-svdw.u=u;
-svdw.v=v;
-
-
-
-
-function saveResult(alpha,lambda,rato,ratotest,dataname)
-    fs=fopen('result.txt','at');
-    %fprintf(fs,'%s\n',dataname)
-    fprintf(fs,'%s:\t','alpha');
-    fprintf(fs,'%f\t',alpha);
-    fprintf(fs,'%s:\t','lambda')
-    fprintf(fs,'%f\n',lambda);
-    fprintf(fs,'%f\n',rato);
-    fprintf(fs,'%f\n',ratotest);
-    fclose(fs);
 
