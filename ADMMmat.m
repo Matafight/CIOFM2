@@ -35,7 +35,7 @@ end
 
 for i=1:iter
     %uupdate each variable
-    newB=update_b2(svdw,y,B,matD,matE,matF,matG,matH,rho,g);
+    newB=update_B(svdw,y,B,matD,matE,matF,matG,matH,rho,g);
     newmatD=update_D(newB,w,rho,g,lambda);
     newmatE=update_E(newB,w,rho,g,lambda);
     newmatF=update_F(newB,w,rho,g,lambda);
@@ -111,7 +111,7 @@ end
 
 
 
-function  bnew=update_b2(svdw,y,B,matD,matE,matF,matG,matH,rho,g);
+function  bnew=update_B(svdw,y,B,matD,matE,matF,matG,matH,rho,g);
 
 [brow,bcol]=size(matD);
 u=svdw.u;
@@ -150,37 +150,7 @@ bnew=reshape(bnew,brow,bcol);
 
 
 
-% g.list 可以用结构体
-%update d e g 与原代码是相同的???
-function X=update_b(w,y,B,matD,matE,matF,matG,matH,rho,g);
-%w is a n*(p1+1*p2+1) matrix ,n is the number of examples
-%convert D,E,F,G,H to p1+1 * p2+1 vector 
-[n,m]=size(w);
-[brow,bcol]=size(matD);
-vmatD=matD(:);
-vmatE=matE(:);
-vmatF=matF(:);
-vmatG=matG(:);
-vmatH=matH(:);
-vg.gamma1=g.gamma1(:);
-vg.gamma2=g.gamma2(:);
-vg.gamma3=g.gamma3(:);
-vg.gamma4=g.gamma4(:);
-vg.gamma5=g.gamma5(:);
-%solve B according to ||y-wx||^2 this formula x=(w^t*w)^{-1}w^t*y,so next construct y and w
-Y=y/sqrt(n);
-Y_down=(rho*(vmatD+vmatE+vmatF+vmatG+vmatH)-(vg.gamma1+vg.gamma2+vg.gamma3+vg.gamma4+vg.gamma5))/sqrt(5*rho);
-Y=[Y;Y_down];
 
-W=w/sqrt(n);
-W_down=sqrt(5*n)*ones(m,m);
-W=[W;W_down];
-%this inverse in time consuming
-X=pinv(W'*W)*W'*Y
-%X=gradientDescentB(Y,W);
-
-%reshape in column order
-X=reshape(X,brow,bcol);
 
 
 
@@ -269,77 +239,8 @@ Hnew=gradientDescentH(diffmean,y,B,g,rho,lambda);
 
 
 
-function H=update_Hingeloss(diffmean,y,B,g,rho,lambda);
-[brow,bcol]=size(B);
-vB=B(:);
-vgamma=g.gamma5(:);
-hrow=size(vB,1);
-H_0=zeros(hrow,1);
-H_guess=H_0;
-mu=2.5;
-epstol=0.001;
-[numEx,numfeat]=size(diffmean);
-U=zeros(numEx,1);
-k=0;
-GF=[];
-iter=100;
-for it=1:iter
-	maxLu=0;
-	for i=1:numEx
-		U(i)=medianVal((1-diffmean(i,:)*H_0)/(mu*norm(diffmean(i,:),'inf')),0,1);
-		maxLu=max(maxLu,norm(diffmean(i,:)'*diffmean(i,:))/norm(diffmean(i,:),'inf'));
-	end
-	
-	gradF=rho*(H_0-(vB+vgamma/rho))-lambda.fif*diffmean'*U;
-	GF=[GF,gradF];
-	
-	L_u=rho+(lambda.fif*numEx/mu)*maxLu;
-	hingeY=H_0-(1/L_u)*gradF;
-	sumGrad=0;
-	sizeG=length(GF);
-	for j=1:sizeG;
-		sumGrad=sumGrad+((j+1)/2)*GF(j);
-	end
-	hingeZ=H_guess-(1/L_u)*sumGrad;
-	
-	H=(2/(k+3))*hingeZ+((k+1)/(k+3))*hingeY;
-	k=k+1;
-	if(calcuFun(mu,rho,H,vB,vgamma,lambda,diffmean)-calcuFun(mu,rho,H_0,vB,vgamma,lambda,diffmean)<epstol)
-	 break
-	end
-	H_0=H;
-end
-H=reshape(H,brow,bcol);
-
-
-function TotaoVal=calcuFun(mu,rho,H,B,gamma,lambda,diffmean);
-
-Firpart=(rho/2)*sum((H-(B+gamma/rho)).^2);
-
-[numc,numfeat]=size(diffmean);
-
-hloss=0;
-for i=1:numc;
-	tempval=diffmean(i,:)*H;
-	if(tempval>1)
-		hloss=hloss+0;
-	
-     elseif(tempval < 1-mu)
-		hloss=hloss+(1-tempval)-(mu/2)*norm(diffmean(i,:),'inf');
-	 
-	else
-		hloss=hloss+(1-tempval)^2/(2*mu*norm(diffmean(i,:),'inf'));
-	end
-end
-TotaoVal=Firpart+lambda.fif*hloss;
-
-function  medv=medianVal(a,b,c);
-vec=[a,b,c];
-sortv=sort(vec);
-medv=sortv(2);
-
-
 %help fun for update H using gradient descent
+%this method is very slow
 function  H=gradientDescentH(diffmean,y,B,g,rho,lambda)
 %convert matrix into vector for convenience
 [orirow,oricol]=size(B);
@@ -375,7 +276,6 @@ function deri=gradientHingeLoss(diffmean,H)
 len=size(diffmean,1);
 lenH=size(H,1);
 deri=zeros(lenH,1);
-
 for i =1:len
     z=diffmean(i,:)*H;
     if(z<=0)
@@ -397,24 +297,7 @@ function gnew=updategammas(w,B,matD,matE,matF,matG,matH,g,rho);
  gnew=g.new;
 
 
-%help function to generate W 
-function xz=outdot(x,z)
-[xrow,xcol]=size(x);
-[zrow,zcol]=size(z);
-xz=[];
-mn=xcol*zcol;
-for i =1 : xrow
-    temp=x(i,:)'*z(i,:);
-    xz=[xz;reshape(temp,1,mn)];
-end
 
-
-function w=generateW(x,z)
-xrow=size(x,1);
-zrow=size(z,1);
-x=[ones(xrow,1),x];
-z=[ones(zrow,1),z];
-w=outdot(x,z);
 
 %help fun for update d,x is a vector and y is a scalar
 function coef=pmax(x,y,isD)
