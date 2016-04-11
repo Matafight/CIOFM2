@@ -1,9 +1,9 @@
-function [rato,mae]=testModel(traindata,oneret,data);
+function [rato,mae]=testModel(traindata,oneret,testdata);
 
-[wte,Yte]=transformData(data);
+[wte,Yte]=transformData(testdata);
 
 [wtr,Ytr]=transformData(traindata);
-[rato,mae]=mypredict_another_cri(wtr,Ytr,wte,oneret.B,Yte);
+[rato,mae]=mypredict_another_cri(wtr,Ytr,wte,Yte,oneret.B);
 
 
 
