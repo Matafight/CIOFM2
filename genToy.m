@@ -25,7 +25,7 @@ B(1:4,1)=1;
 
 
 
-y=w*B(:);
+y=w*B(:)+randn(numsample,1);
 
 data=equalBin(x,y);
 savefile(data);
