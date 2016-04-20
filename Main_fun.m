@@ -7,7 +7,7 @@ totalmae=[];
 addpath ./libqp/matlab/
 mydir='./dataset/';
 bestpars=[];
-for i = 1:20,
+for i = 0:19,
 
 i
 %call CrossV to find the best hyperpara and return the trained coefficient ,then Call testmodel to test the result
