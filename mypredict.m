@@ -1,4 +1,4 @@
-function [rato,mae]=mypredict(wtr,ytr,wte,yte,B);
+function [mze,mae]=mypredict(wtr,ytr,wte,yte,B);
 
 
 [meanfeat,uniqueY]=separateClasses(wtr,ytr);
@@ -28,9 +28,9 @@ tempdiff=preval-bk;
 
 diffval=index-yte;
  
-%return MZE,this is the accuracy
+%return MZE,this is the errorrato
 ind=find(diffval == 0);
-rato=length(ind)/m;
+mze=length(ind)/m;
 
 %return MAE
 tmae=abs(index-yte);

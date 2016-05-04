@@ -92,8 +92,8 @@ iterk=0;
 					svdw.v=v;
 					
 					newoneret=ADMMmat(wtr,svdw,Ytr,lambda,B,matD,matE,matF,matG,matH,g,rho);
-					[acc,mae]=mypredict(wtr,Ytr,wte,Yte,newoneret.finB);
-                    ratotest=ratotest+acc;
+					[mze,mae]=mypredict(wtr,Ytr,wte,Yte,newoneret.B);
+                    ratotest=ratotest+mze;
 
                      %to accelerate the calculation 
                     B=newoneret.B;
@@ -146,8 +146,8 @@ lambda.fif=bestpar.par4;
 
 newoneret=ADMMmat(wt,svdw,Y,lambda,B,matD,matE,matF,matG,matH,g,rho);
 %test if it is overfittng
-[acc,mae]=mypredict(wt,Y,wt,Y,newoneret.finB);
-acc
+[mze,mae]=mypredict(wt,Y,wt,Y,newoneret.B);
+mze
 
 
 
@@ -157,7 +157,7 @@ function bestpar=seleBest(bestret);
 bestrow=1;
 
 for i = 1:row;
-    if(bestret(i).rato>bestret(bestrow).rato);
+    if(bestret(i).rato > bestret(bestrow).rato);
         bestrow=i;
      end
 end

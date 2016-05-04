@@ -1,9 +1,9 @@
-function [rato,mae]=testModel(traindata,oneret,testdata);
+function [mze,mae]=testModel(traindata,oneret,testdata);
 
 [wte,Yte]=transformData(testdata);
 
 [wtr,Ytr]=transformData(traindata);
-[rato,mae]=mypredict(wtr,Ytr,wte,Yte,oneret.finB);
+[mze,mae]=mypredict(wtr,Ytr,wte,Yte,oneret.B);
 
 
 
