@@ -2,13 +2,13 @@ function data=genToy()
 
 %7¸öfeature,1000¸ösamples
 numsample=500;
-x=randn(numsample,7);
+X=randn(numsample,7);
 
 w=[]
 
 
 
-x=[ones(numsample,1),x];
+x=[ones(numsample,1),X];
 
 
 for i=1:8;
@@ -27,22 +27,24 @@ B(1:4,1)=1;
 
 y=w*B(:)+randn(numsample,1);
 
-data=equalBin(x,y);
+data=equalBin(X,y);
 savefile(data);
+
+
 
 function newdata=equalBin(x,y)
 
-data=[x,y]
-[n,m]=size(x)
+data=[x,y];
+[n,m]=size(x);
 
-newdata=sortrows(data,m+1)
+newdata=sortrows(data,m+1);
 
 %divide the data into 5bins
 
-binsize=n/5
+binsize=n/5;
 
 for i = 1:5,
-    newdata((i-1)*binsize+1:i*binsize,m+1)=i
+    newdata((i-1)*binsize+1:i*binsize,m+1)=i;
 end
 
 

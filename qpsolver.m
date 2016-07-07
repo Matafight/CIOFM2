@@ -7,7 +7,8 @@ vg=reshape(g.gamma5,xcol,1);
 A=B+vg/rho;
 
 %construct q
-q=(1-X*A);
+%q=(1-X*A); %这个q 有问题吧
+q = (X*A -1);
 %construct K
 K=X*X';
 lb=zeros(xrow,1);
@@ -19,6 +20,9 @@ b=0;
 
 [alpha,~] = libqp_gsmo(K, q, a, b, lb, lu,[],opt);
 
-W=(X'*alpha)/rho + A;
+
+%W=(X'*alpha)/rho + A; %这个w
+W = (X'*alpha) + A;
+
 W=reshape(W,brow,bcol);
 

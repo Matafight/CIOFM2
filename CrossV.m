@@ -73,7 +73,8 @@ iterk=0;
                     lambda.fir=parameter(par1);
                     lambda.sec=parameter(par1);
                     lambda.thi=parameter(par2);
-                    lambda.four=parasmaller(par3);
+                    %lambda.four=parasmaller(par3);
+                    lambda.four=parameter(par3);
                     lambda.fif=parameter(par4);
 				
 					wtr=train_data(:,1:nnewcol-1);
@@ -92,7 +93,7 @@ iterk=0;
 					svdw.v=v;
 					
 					newoneret=ADMMmat(wtr,svdw,Ytr,lambda,B,matD,matE,matF,matG,matH,g,rho);
-					[mze,mae]=mypredict(wtr,Ytr,wte,Yte,newoneret.B);
+					[mze,mae]=mypredict_another_cri(wtr,Ytr,wte,Yte,newoneret.finB);
                     ratotest=ratotest+mze;
 
                      %to accelerate the calculation 
@@ -112,7 +113,8 @@ iterk=0;
              % end
                   bestret(iterk).par1=parameter(par1);
                   bestret(iterk).par2=parameter(par2);
-                  bestret(iterk).par3=parasmaller(par3);
+                  %bestret(iterk).par3=parasmaller(par3);
+                  bestret(iterk).par3=parameter(par3);
                   bestret(iterk).par4=parameter(par4);
                   bestret(iterk).rato=averrato;
                  
@@ -146,8 +148,8 @@ lambda.fif=bestpar.par4;
 
 newoneret=ADMMmat(wt,svdw,Y,lambda,B,matD,matE,matF,matG,matH,g,rho);
 %test if it is overfittng
-[mze,mae]=mypredict(wt,Y,wt,Y,newoneret.B);
-mze
+[mze,mae]=mypredict_another_cri(wt,Y,wt,Y,newoneret.finB);
+
 
 
 
