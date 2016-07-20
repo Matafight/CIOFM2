@@ -1,18 +1,9 @@
 function [newoneret,bestpar]=crossValid(data)
 
-[nrow,ncol]=size(data);
-X=data(:,1:ncol-1);
-Y=data(:,ncol);
-X=[ones(nrow,1),X];
-datalen=[];
-for i=1:ncol;
-    for j=1:ncol;
-        datalen=[datalen,X(:,j).*X(:,i)];
-     end
-end
-data=[datalen,Y];
-nnewcol=size(data,2);
+data = transform_data(data);
+[nrow,nnewcol]=size(data);
 
+ncol = sqrt(nnewcol-1);
 
 B=zeros(ncol,ncol);
 matD=B;
@@ -27,16 +18,16 @@ g.gamma4=B;
 g.gamma5=B;
 rho=1;
 
-barray.alpha=0;
-barray.lambda=0;
-barray.oneret.finB=B;
-barray.oneret.B=B;
-barray.oneret.D=matD;
-barray.oneret.E=matE;
-barray.oneret.F=matF;
-barray.oneret.rho=rho;
-barray.oneret.glist=g;
-barray.oneret.iters=0;
+%barray.alpha=0;
+%barray.lambda=0;
+%barray.oneret.finB=B;
+%barray.oneret.B=B;
+%barray.oneret.D=matD;
+%barray.oneret.E=matE;
+%barray.oneret.F=matF;
+%barray.oneret.rho=rho;
+%barray.oneret.glist=g;
+%barray.oneret.iters=0;
 
 
 %5 fold 
@@ -44,37 +35,37 @@ barray.oneret.iters=0;
 ind=randperm(nrow);
 data=data(ind,:);
 
-%我觉得overfitting是这个参数的锅，
-parasmaller=[1e-4,1e-3,1e-2,1e-1,1];
-parameter=[1e-2,1e-1,1,10,100];
 
-ret.par1=0;
-ret.par2=0;
-ret.par3=0;
-ret.par4=0;
-ret.rato=0;
-bestret=repmat(ret,625,1);
-iterk=0;
- for par1=1:5;
-      for par2=1:5;
-          for par3=1:5;
-             for par4=1:5;
-                   iterk=iterk+1;    
+%parametersmaller=[1e-6,1e-5,1e-4,1e-3,1e-2,1e-1];
+parametersmaller = [1e-3,1e-2,1e-1,1,10,100,1000];
+parameter=[1e-3,1e-2,1e-1,1,10,100,1000];
+
+bestret.par1=0;
+bestret.par2=0;
+bestret.par3=0;
+bestret.par4=0;
+
+
+bestrato = 0;
+numparasmaller = length(parametersmaller);
+numpara = length(parameter);
+ for par1=1:numparasmaller;
+      for par2=1:numparasmaller;
+          for par3=1:numparasmaller;
+             for par4=1:numpara;
                    aboverato=0;
-              % for runit=1:3;% run 3 times
                     ratotest=0;
-                    averrate=0;
 					indices=crossvalind('kfold',nrow,5);
                  for i=1:5;
                     test=(indices==i);
                     train=~test;
                     train_data=data(train,:);
                     test_data=data(test,:);
-                    lambda.fir=parameter(par1);
-                    lambda.sec=parameter(par1);
-                    lambda.thi=parameter(par2);
+                    lambda.fir=parametersmaller(par1);
+                    lambda.sec=parametersmaller(par1);
+                    lambda.thi=parametersmaller(par2);
                     %lambda.four=parasmaller(par3);
-                    lambda.four=parameter(par3);
+                    lambda.four=parametersmaller(par3);
                     lambda.fif=parameter(par4);
 				
 					wtr=train_data(:,1:nnewcol-1);
@@ -108,26 +99,22 @@ iterk=0;
                   end
                  
                   averrato=ratotest/5;
-                 
-                 % aboverato=aboverato+averrato;
-             % end
-                  bestret(iterk).par1=parameter(par1);
-                  bestret(iterk).par2=parameter(par2);
-                  %bestret(iterk).par3=parasmaller(par3);
-                  bestret(iterk).par3=parameter(par3);
-                  bestret(iterk).par4=parameter(par4);
-                  bestret(iterk).rato=averrato;
-                 
-                  %averrato
-				   %bestret(iterk).rato=aboverato/3;
-                   %aboverato/3
+                  if (averrato > bestrato);
+                      bestrato = averrato ;
+                      bestret.par1 = parametersmaller(par1);
+                      bestret.par2 = parametersmaller(par2);
+                      bestret.par3 = parametersmaller(par3);
+                      bestret.par4 = parameter(par4);
+
+                  end
+           
           end
 
           end
       end
 
 end
-bestpar=seleBest(bestret);
+bestpar=bestret;
 
 wt=data(:,1:nnewcol-1);
 Y=data(:,nnewcol);
@@ -150,20 +137,6 @@ newoneret=ADMMmat(wt,svdw,Y,lambda,B,matD,matE,matF,matG,matH,g,rho);
 %test if it is overfittng
 [mze,mae]=mypredict_another_cri(wt,Y,wt,Y,newoneret.finB);
 
-
-
-
-function bestpar=seleBest(bestret);
-
-[row,col]=size(bestret);
-bestrow=1;
-
-for i = 1:row;
-    if(bestret(i).rato > bestret(bestrow).rato);
-        bestrow=i;
-     end
-end
-bestpar=bestret(bestrow)
 
 
 

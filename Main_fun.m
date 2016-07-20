@@ -14,6 +14,7 @@ i
 %call CrossV to find the best hyperpara and return the trained coefficient ,then Call testmodel to test the result
 trainname=[mydir,dataname,'/','train_',dataname,'.',num2str(i)];
 traindata=load(trainname);
+
 testname=[mydir,dataname,'/','test_',dataname,'.',num2str(i)];
 testdata=load(testname);
 
@@ -35,7 +36,8 @@ result.mae=sum(totalmae)/20;
 result.maestd=std(totalmae);
 result.coefficient = coefficients;
 resultdir = './Result/'
-rename=[resultdir,dataname,'jieguo'];
+nowtime = datestr(date);
+rename=[resultdir,dataname,nowtime];
 save(rename,'result','bestpars')
 
 

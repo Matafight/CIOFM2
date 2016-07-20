@@ -7,7 +7,6 @@ X=randn(numsample,7);
 w=[]
 
 
-
 x=[ones(numsample,1),X];
 
 
@@ -22,7 +21,7 @@ B=zeros(8,8);
 
 B(1,1:4)=1;
 B(1:4,1)=1;
-
+B(1:4,1:4) = 1;
 
 
 y=w*B(:)+randn(numsample,1);
